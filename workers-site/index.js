@@ -4,16 +4,24 @@ import {
   NotFoundError,
 } from "@cloudflare/kv-asset-handler";
 
-addEventListener("fetch", (event) => {
-  event.respondWith(handleEvent(event));
-});
+const handleEvent = async (event) => {
+  const { request } = event;
+  const { headers, url } = request;
 
-async function handleEvent(event) {
-  const { searchParams } = new URL(event.request.url);
-  const token = searchParams.get("token");
+  const id = new URL(url).searchParams.get("id");
+  const referrer = headers.get("Referer");
 
-  if (!token) {
+  if (!id || !referrer) {
     return new Response("", { status: 403 });
+  }
+
+  const allowedDomains = await REFERRER_KV.get(id);
+
+  if (
+    !allowedDomains ||
+    !allowedDomains.split(/\s*,\s*/).includes(new URL(referrer).hostname)
+  ) {
+    return new Response("Access not allowed", { status: 403 });
   }
 
   try {
@@ -29,4 +37,8 @@ async function handleEvent(event) {
 
     return new Response("", { status: 500 });
   }
-}
+};
+
+addEventListener("fetch", (event) => {
+  event.respondWith(handleEvent(event));
+});
