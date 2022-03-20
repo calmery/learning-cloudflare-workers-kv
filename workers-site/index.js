@@ -9,19 +9,20 @@ const handleEvent = async (event) => {
   const { headers, url } = request;
 
   const id = new URL(url).searchParams.get("id");
-  const referrer = headers.get("Referer");
 
-  if (!id || !referrer) {
-    return new Response("", { status: 403 });
+  if (!id) {
+    return new Response("No id provided", { status: 400 });
   }
 
   const allowedDomains = await REFERRER_KV.get(id);
+  const referrer = headers.get("Referer");
 
   if (
     !allowedDomains ||
-    !allowedDomains.split(/\s*,\s*/).includes(new URL(referrer).hostname)
+    (referrer &&
+      !allowedDomains.split(/\s*,\s*/).includes(new URL(referrer).hostname))
   ) {
-    return new Response("Access not allowed", { status: 403 });
+    return new Response("Access from not allowed", { status: 403 });
   }
 
   try {
@@ -35,6 +36,7 @@ const handleEvent = async (event) => {
       return new Response("", { status: 404 });
     }
 
+    // ToDo: エラーを記録する
     return new Response("", { status: 500 });
   }
 };
