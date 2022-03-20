@@ -1,0 +1,7 @@
+account_id = "73225771bf7e17a861e82fc460bdd855"
+compatibility_date = "2022-03-20"
+kv_namespaces = [{ binding = "REFERRER_KV", id = "f1606733518d48ffbbadd42b129dabc2", preview_id = "ab3f98a2a0204696a2aea3e3628c8ed0" }]
+name = "pafit"
+site = { bucket = "./public/" }
+type = "webpack"
+workers_dev = true
