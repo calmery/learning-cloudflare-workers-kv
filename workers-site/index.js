@@ -20,7 +20,9 @@ const handleEvent = async (event) => {
   if (
     !allowedDomains ||
     (referrer &&
-      !allowedDomains.split(/\s*,\s*/).includes(new URL(referrer).hostname))
+      !JSON.parse(allowedDomains)
+        .split(/\s*,\s*/)
+        .includes(new URL(referrer).hostname))
   ) {
     return new Response("Access from not allowed", { status: 403 });
   }
